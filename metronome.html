@@ -53,6 +53,10 @@
             font-size: 16px;
         }
 
+        h1 {
+            font-weight: normal;
+            font-size: 20px;
+        }
     </style>
 
     <script>
@@ -117,7 +121,7 @@
                 oscillator.start()
             }
 
-            if (my_play_button.innerText == "Play") {
+            if (my_play_button.innerText == "Start") {
                 change_bpm()
                 // toggle text
                 my_play_button.innerText = "Stop"
@@ -125,7 +129,7 @@
             } else {
                 stop_playing()
                 // toggle text
-                my_play_button.innerText = "Play"
+                my_play_button.innerText = "Start"
                 my_play_button.style.backgroundColor = "lightgreen"
             }
         }
@@ -299,14 +303,16 @@
 
 <body onload="my_onload()" onkeydown="handle_key(event)">
 
-    <div id="my_bpm_label">BPM</div>
+    <h1>Metronome</h1>
+
+    <div><button onclick="play_or_stop()" id="my_play_button">Start</button></div>
+
+    <div>
     <input id="my_bpm_input" onchange="change_bpm()" type="number" min="40" max="300" step="1" value="120" />
     <button class="plus_minus" onclick="increment_bpm(1)">+</button>
     <button class="plus_minus" onclick="increment_bpm(-1)">-</button>
-    <button onclick="play_or_stop()" id="my_play_button">Play</button>
+    </div>
 
-    <br>
-   
     <table>
         <tr>
             <td><button class="increment" onclick="increment_bpm(2)">+2 Q</button></td>
