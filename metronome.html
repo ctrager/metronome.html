@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Metronome</title>
     <link rel="icon" type="image/x-icon"
-    href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB2UlEQVRYR8XXT4hOURjH8c9oZMMskSJMk2RhYWOnKMaKUJrtxAILoRRZEEoSZTOJhZUsrKwldmpqUqSkLPyXlBUz/vfoKN3uO/e+17ndU+/ivuee5/c9z79z7oD/H5+wGm+bmBposqiw5htW4XkTW7kAduJ2lwDXsK9LgJmUBy/7hcgVgkHcxWb86AciJ0DoXsbBLgFC+wgu1oXI5YEowRGEvZ/YjVt1IHIBrMQQjmMMn7Eej6sgcgB8RQC8SmIbcQMfsA4x33PkAIgSHP4HIMTW4AFO4UIXAKF5FIexFNGuS0dbHgix+XiDHbjTBUBo3sRDnGsbIJLwdYnIgZSg0RtaDcGK5O6iyCg24FibANNplxHv4tiUkvB6mwBfUhmWAezBfTxrGyByoOxKdhLxa7URhQciB94VVOalk/F8VwC78AhPuwI4hEuzicdcjk5YFoIlWIypnAALsBfbsQwhHNew+C+eizlQpf1nvq4HtuEKFvWwGrt9X0ux8FIdgHFcxZxZBBam879vhiqAqO8niJLqNV5gOX71rV4jBCdwusJwnPmV2d60E55N97xe6yMJt+B7k93XScK1mMTcEoE4YPanamiqX6sKtuJM+gL+iHuYSHe+xsJ/F/4G8jBjIfCBJUEAAAAASUVORK5CYII=" />
+        href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB2UlEQVRYR8XXT4hOURjH8c9oZMMskSJMk2RhYWOnKMaKUJrtxAILoRRZEEoSZTOJhZUsrKwldmpqUqSkLPyXlBUz/vfoKN3uO/e+17ndU+/ivuee5/c9z79z7oD/H5+wGm+bmBposqiw5htW4XkTW7kAduJ2lwDXsK9LgJmUBy/7hcgVgkHcxWb86AciJ0DoXsbBLgFC+wgu1oXI5YEowRGEvZ/YjVt1IHIBrMQQjmMMn7Eej6sgcgB8RQC8SmIbcQMfsA4x33PkAIgSHP4HIMTW4AFO4UIXAKF5FIexFNGuS0dbHgix+XiDHbjTBUBo3sRDnGsbIJLwdYnIgZSg0RtaDcGK5O6iyCg24FibANNplxHv4tiUkvB6mwBfUhmWAezBfTxrGyByoOxKdhLxa7URhQciB94VVOalk/F8VwC78AhPuwI4hEuzicdcjk5YFoIlWIypnAALsBfbsQwhHNew+C+eizlQpf1nvq4HtuEKFvWwGrt9X0ux8FIdgHFcxZxZBBam879vhiqAqO8niJLqNV5gOX71rV4jBCdwusJwnPmV2d60E55N97xe6yMJt+B7k93XScK1mMTcEoE4YPanamiqX6sKtuJM+gL+iHuYSHe+xsJ/F/4G8jBjIfCBJUEAAAAASUVORK5CYII=" />
 
     <style>
         body {
@@ -65,17 +65,19 @@
 
     <script>
 
+        "use strict"
+
         var AudioContext = window.AudioContext || window.webkitAudioContext; // cross browser    
         var audio_context
         var oscillator
         var gain
-      
+
         var my_play_button
         var my_bpm_input
         var my_volume_input
 
         var my_tap_results
-     
+
         var char_to_increment = {}
 
         var prev_tap_time = 0
@@ -84,7 +86,7 @@
 
         var beats = "1"
         var current_beat = 1
-    
+
         var running = false
 
         function my_onload() {
@@ -100,13 +102,12 @@
             char_to_increment.D = -6
             char_to_increment.F = -8
             char_to_increment.G = -10
-                      
-            my_audio_element = document.getElementById("my_audio")
+
             my_play_button = document.getElementById("my_play_button")
             my_bpm_input = document.getElementById("my_bpm_input")
             my_tap_results = document.getElementById("my_tap_results")
             my_volume_input = document.getElementById("my_volume_input")
-          
+
         }
 
         function play_or_stop() {
@@ -151,21 +152,21 @@
 
             running = true
 
-            var volume 
+            var volume
 
             var now = audio_context.currentTime
 
             // schedule click 1 a little in the future so that click 2 doesn't come right after the late click 1
             now += .5
- 
+
             // Schedule 15 minutes of iterations
             // This seem to go bad if I schedule TOO many (race condition?)
             // I couldn't figure out a way to do this where the metronome would never run out. 
             var iterations = 15 * my_bpm_input.value
- 
+
             // how much time from one click to the next
             var interval_in_seconds = 60.0 / my_bpm_input.value
- 
+
             for (var i = 0; i < iterations; i++) {
                 // calc how loud, calc if this beat should be the louder "accented" beat
                 if (beats == "1") {
@@ -174,7 +175,7 @@
                 }
                 else {
                     volume = calc_accented_volume(beats)
-                } 
+                }
 
                 schedule_one_click(now + (i * interval_in_seconds), volume)
             }
@@ -192,13 +193,13 @@
             gain.gain.cancelScheduledValues(time)
             gain.gain.setValueAtTime(0, time)
             gain.gain.linearRampToValueAtTime(volume, time + .001);
-            gain.gain.linearRampToValueAtTime(0, time + .001 + .01);  
+            gain.gain.linearRampToValueAtTime(0, time + .001 + .01);
         }
 
         function calc_accented_volume(beats) {
-            
+
             var volume = my_volume_input.value
-            
+
             if (current_beat == 1) {
                 volume = (volume / 10.0) * 2.0 // louder
             }
@@ -217,7 +218,7 @@
                 current_beat = 1
             }
 
-            return volume            
+            return volume
         }
 
         function change_volume() {
@@ -238,7 +239,7 @@
             stop_start()
         }
 
-        function increment_bpm(increment)  {
+        function increment_bpm(increment) {
             // put focus back to play/stop otherwise spacebar affects last pressed button
             //my_play_button.focus()
             my_bpm_input.value = parseInt(my_bpm_input.value) + increment
@@ -250,7 +251,7 @@
         function increment_volume(increment) {
 
             var volume = parseInt(my_volume_input.value)
-            
+
             volume += increment
 
             if (volume > 10) {
@@ -268,10 +269,10 @@
 
 
         function handle_tap() {
-            
+
             // calc bpm from taps
             var now = new Date().getTime()
-            
+
             if (prev_tap_time != 0) {
                 var delta_milliseconds = now - prev_tap_time
                 accumulated_tap_time += delta_milliseconds
@@ -279,13 +280,13 @@
                 var avg_milliseconds = accumulated_tap_time / number_of_taps
                 var last = Math.round(60 * 1000 / delta_milliseconds)
                 var bpm = Math.round(60 * 1000 / avg_milliseconds)
-                my_tap_results.innerText = "last tap=" + last + ", avg bpm=" + bpm 
+                my_tap_results.innerText = "last tap=" + last + ", avg bpm=" + bpm
             }
             else {
                 my_tap_results.innerText = "tapping started..."
             }
-            prev_tap_time = now     
-    
+            prev_tap_time = now
+
         }
 
         function reset_tap() {
@@ -323,9 +324,9 @@
     <div><button onclick="play_or_stop()" id="my_play_button">Start</button></div>
 
     <div>
-    <input id="my_bpm_input" onchange="change_bpm()" type="number" min="40" max="300" step="1" value="120" />
-    <button class="plus_minus" onclick="increment_bpm(1)">+</button>
-    <button class="plus_minus" onclick="increment_bpm(-1)">-</button>
+        <input id="my_bpm_input" onchange="change_bpm()" type="number" min="40" max="300" step="1" value="120" />
+        <button class="plus_minus" onclick="increment_bpm(1)">+</button>
+        <button class="plus_minus" onclick="increment_bpm(-1)">-</button>
     </div>
 
     <table>
@@ -364,7 +365,8 @@
     <div>Pitch</div>
     <label><input type="radio" name="frequency" value="600" onclick="change_frequency(this)">600</input></label>
     <label><input type="radio" name="frequency" value="800" onclick="change_frequency(this)">800</input></label>
-    <label><input type="radio" name="frequency" value="1000" onclick="change_frequency(this)" checked>1000</input></label>
+    <label><input type="radio" name="frequency" value="1000" onclick="change_frequency(this)"
+            checked>1000</input></label>
     <label><input type="radio" name="frequency" value="1200" onclick="change_frequency(this)">1200</input></label>
     <label><input type="radio" name="frequency" value="1600" onclick="change_frequency(this)">1600</input></label>
 
@@ -375,9 +377,10 @@
     </div>
     <div id="my_tap_results"></div>
     <div id="my_tap_pad" onclick="handle_tap()"></div>
-    
+
     <br>
-    <div>by <a href="https://ctrager.github.io">Corey Trager</a> - <a href="https://github.com/ctrager/metronome.html">https://github.com/ctrager/metronome.html</a></div>
+    <div>by <a href="https://ctrager.github.io">Corey Trager</a> - <a
+            href="https://github.com/ctrager/metronome.html">https://github.com/ctrager/metronome.html</a></div>
 
 </body>
 
